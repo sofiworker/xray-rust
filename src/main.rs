@@ -1,18 +1,26 @@
+use clap::{Command, arg};
+
 fn main() {
-    let cmd = clap::Command::new("xray-rust")
+
+    let run_cmd = Command::new("run")
+    .about("to run xray-rust")
+    .args([
+        arg!(-d --dump "Dump merged config only, without launching Xray server."),
+        arg!(-t --test "Test config file only, without launching Xray server."),
+        arg!(-f --format "Format of input file."),
+    ]);
+
+    let cmd = Command::new("xray-rust")
         .bin_name("xray")
-        .subcommand_required(true)
-        .subcommand(
-            clap::command!("config").arg(
-                clap::arg!(--"manifest-path" <PATH>)
-                    .value_parser(clap::value_parser!(std::path::PathBuf)),
-            ),
-        );
+        .author("sofiworker")
+        .version("1.0.0")
+        .about("this xray-core use rust wirite")
+        .subcommand(run_cmd);
+
     let matches = cmd.get_matches();
-    let matches = match matches.subcommand() {
-        Some(("example", matches)) => matches,
-        _ => unreachable!("clap should ensure we don't get here"),
+    match matches.subcommand() {
+        Some(("run", matches)) => println!("{}", 1),
+        _ => unreachable!("the xray-rust run failed!"),
     };
-    let config_path = matches.get_one::<std::path::PathBuf>("config-path");
-    println!("{config_path:?}");
 }
+ 
