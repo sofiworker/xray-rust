@@ -7,4 +7,5 @@ edition = "2021"
 
 [dependencies]
 clap = "4.4.10"
+config = "0.14.0"
 notify = "5.0.0"
