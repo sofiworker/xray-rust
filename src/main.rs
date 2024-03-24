@@ -1,8 +1,6 @@
-pub mod conf;
-
 use clap::{arg, Command};
 
-// use conf;
+pub mod conf;
 
 fn main() {
     let run_cmd = Command::new("run").about("to run xray-rust").args([
@@ -20,7 +18,6 @@ fn main() {
         .author("sofiworker")
         .version("1.0.0")
         .about("this xray-core use rust wirite")
-        .args([arg!(-h --help "to show xray-rust version")])
         .subcommand(run_cmd)
         .subcommand(version_cmd);
 
@@ -28,7 +25,7 @@ fn main() {
     match matches.subcommand() {
         Some(("run", _matches)) => {
             println!("{}", 1);
-            conf::show();
+            conf::setting_conf::SettingConfig::get();
         }
         Some(("version", _matches)) => println!("v1.0.0"),
         _ => unreachable!("the xray-rust run failed!"),
