@@ -1,6 +1,7 @@
 use std::{fs::File, io::BufReader};
 
 use lazy_static::lazy_static;
+use log::debug;
 use serde::{Deserialize, Serialize};
 
 #[derive(Serialize, Deserialize, Debug)]
@@ -62,7 +63,7 @@ impl Default for SettingConfig {
 
         let c: SettingConfig = serde_json::from_reader(reader).expect("parse config file failed");
 
-        println!("{:?}", c);
+        debug!("{:?}", c);
         return c;
     }
 }
