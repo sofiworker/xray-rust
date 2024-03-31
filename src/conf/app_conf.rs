@@ -1,21 +1,17 @@
-use std::collections::HashMap;
-use std::path::Path;
-use std::string::ToString;
-use std::sync::{Arc, Mutex};
-use serde::{Deserialize, Deserializer, Serialize};
-use config::Config as cconfig;
 use config::File as cfile;
 use config::FileFormat as cfileformat;
-use notify::{event, RecommendedWatcher, RecursiveMode, Watcher};
-use std::thread;
-use std::thread::Thread;
-use std::time::Duration;
-use log::debug;
-use notify::Config as nconfig;
-use tokio::sync::watch::channel;
-use tokio::task;
+use notify::Watcher;
+use serde::{Deserialize, Deserializer, Serialize};
 
 static PATH: &str = "conf\\app_config.toml";
+
+#[derive(Serialize, Deserialize, Debug, Clone)]
+pub enum AppMode {
+    Client,
+    Server,
+    Relay,
+    Gateway,
+}
 
 #[derive(Serialize, Deserialize, Debug, Clone)]
 pub struct AppConfig {
@@ -26,9 +22,11 @@ pub struct AppConfig {
 
 #[derive(Serialize, Deserialize, Debug, Clone)]
 pub struct App {
+    pub mode: AppMode,
     pub setting_path: String,
     pub log_level: String,
     pub allow_lan: bool,
+    pub plugin_dir: String,
 }
 
 #[derive(Serialize, Deserialize, Debug, Clone)]

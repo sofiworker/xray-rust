@@ -1,8 +1,10 @@
 
+#[derive(Debug)]
 pub struct Sniff {
 
 }
 
+#[derive(Debug)]
 pub struct DownStream {
     tag: String,
     addr: String,
@@ -11,7 +13,7 @@ pub struct DownStream {
     sniff: Sniff,
 }
 
-
+#[derive(Debug)]
 pub struct UpStream {
     tag: String,
     addr: String,

@@ -2,7 +2,7 @@ title = "the app config"
 
 [app]
 mode = "client" # client server relay gateway
-setting_path = "conf"
+setting_path = "conf\\config.json"
 log_level = "debug"
 allow_lan = false
 plugin_dir = "."

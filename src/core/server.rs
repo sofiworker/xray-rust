@@ -1,9 +1,11 @@
-use std::string;
+use std::{net, string};
+use std::net::SocketAddr;
 
 use crate::conf;
 use log::{debug, error};
+use tokio::io;
 use tokio::io::{AsyncReadExt, AsyncWriteExt};
-use tokio::net::TcpListener;
+use tokio::net::{TcpListener, TcpStream};
 use crate::conf::AppConfig;
 use crate::core::stream::{DownStream, UpStream};
 
@@ -11,7 +13,7 @@ use crate::core::stream::{DownStream, UpStream};
 pub struct Server {
     app_config: AppConfig,
     down_stream: Vec<DownStream>,
-    up_stream: Vec<UpStream>
+    up_stream: Vec<UpStream>,
 }
 
 impl Server {
@@ -23,9 +25,17 @@ impl Server {
         }
     }
 
-    pub async fn start(&self) -> Result<(), ()> {
+    pub async fn start(&self) -> io::Result<()> {
         let addr = format!("{}:{}", self.app_config.net.addr, self.app_config.net.port);
-        debug!("use [{}] as transport, bind [{}]", self.app_config.net.transport, addr);;
-        Ok(())
+        debug!("use [{}] as transport, bind [{}]", self.app_config.net.transport, addr);
+        let listener = TcpListener::bind(addr).await?;
+        loop {
+            let (stream, socket_addr) = listener.accept().await?;
+            tokio::spawn(async move {
+                Self::process(stream, socket_addr).await
+            });
+        }
     }
+
+    async fn process(stream: TcpStream, addr: SocketAddr) {}
 }
