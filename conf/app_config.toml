@@ -1,0 +1,17 @@
+title = "the app config"
+
+[app]
+mode = "client" # client server relay gateway
+setting_path = "conf"
+log_level = "debug"
+allow_lan = false
+plugin_dir = "."
+
+[net]
+transport = "tcp"
+port = 7890
+addr = "127.0.0.1"
+interfaces = "lo"
+mux = true # use mux only tcp as transport to use
+prefer_v6 = false
+dns_policy = "dot" # DoT DoH normarl/''

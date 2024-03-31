@@ -1,34 +1,56 @@
-use lazy_static::lazy_static;
-use serde::{Deserialize, Serialize};
-use std::fs::File;
-use std::io::BufReader;
+use std::collections::HashMap;
+use std::path::Path;
+use std::string::ToString;
+use std::sync::{Arc, Mutex};
+use serde::{Deserialize, Deserializer, Serialize};
+use config::Config as cconfig;
+use config::File as cfile;
+use config::FileFormat as cfileformat;
+use notify::{event, RecommendedWatcher, RecursiveMode, Watcher};
+use std::thread;
+use std::thread::Thread;
+use std::time::Duration;
+use log::debug;
+use notify::Config as nconfig;
+use tokio::sync::watch::channel;
+use tokio::task;
 
-#[derive(Serialize, Deserialize, Debug, Clone, Copy)]
+static PATH: &str = "conf\\app_config.toml";
+
+#[derive(Serialize, Deserialize, Debug, Clone)]
 pub struct AppConfig {
+    pub title: String,
+    pub app: App,
+    pub net: Net,
 }
 
+#[derive(Serialize, Deserialize, Debug, Clone)]
+pub struct App {
+    pub setting_path: String,
+    pub log_level: String,
+    pub allow_lan: bool,
+}
 
-impl Default for AppConfig {
-    fn default() -> Self {
-        // let file_path = "../config/config.json";
-
-        // let mut file = match File::open(file_path) {
-        //     Ok(f) => f,
-        //     Err(e) => panic!("error is op en conf {e}"),
-        // };
-
-        // let reader = BufReader::new(file);
-
-        // let c: Config = serde_json::from_reader(reader).expect("parse config file failed");
-        AppConfig {}
-    }
+#[derive(Serialize, Deserialize, Debug, Clone)]
+pub struct Net {
+    pub transport: String,
+    pub port: i32,
+    pub addr: String,
 }
 
 impl AppConfig {
-    pub fn get<'a>() -> &'a Self {
-        lazy_static! {
-            static ref CACHE: AppConfig = AppConfig::default();
-        }
-        &CACHE
+    pub fn new() -> AppConfig {
+        Self::read_config()
+    }
+
+    fn read_config() -> AppConfig {
+        let settings = config::Config::builder()
+            .add_source(cfile::new(PATH, cfileformat::Toml)).build().unwrap();
+        let result: Result<AppConfig, config::ConfigError> = settings.try_deserialize();
+        result.unwrap()
+    }
+
+    pub fn get_data() -> AppConfig {
+        Self::read_config()
     }
 }
