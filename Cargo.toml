@@ -3,6 +3,11 @@ name = "xray-rust"
 version = "0.1.0"
 edition = "2021"
 
+[build]
+jobs = 20                      # 并行构建任务的数量，默认等于 CPU 的核心数
+incremental = true            # 是否开启增量编译
+
+
 [dependencies]
 clap = "4.4.10"
 config = "0.14.0"
@@ -16,3 +21,6 @@ tokio = { version = "1.37.0", features = ["full"] }
 rustc_version = "0.4.0"
 signal-hook = "0.3.17"
 bytes = "1.6.0"
+hyper = { version = "1", features = ["full"] }
+hyper-util = { version = "0.1", features = ["full"] }
+http-body-util = "0.1"

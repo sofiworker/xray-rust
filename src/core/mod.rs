@@ -10,6 +10,8 @@ pub mod handler;
 
 pub mod app;
 mod net;
-mod stream;
-mod auth;
-mod session;
+pub mod stream;
+pub mod auth;
+pub mod session;
+pub mod tc;
+pub mod feature;

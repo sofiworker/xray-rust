@@ -4,6 +4,12 @@ pub enum SocksVersion {
     Version5,
 }
 
-pub struct Socks {
+pub struct SocksStream {
     pub version: SocksVersion,
+}
+
+
+#[cfg(test)]
+mod test {
+
 }

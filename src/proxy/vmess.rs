@@ -1,4 +1,4 @@
 
-pub struct Vmess {
+pub struct VmessStream {
     
 }

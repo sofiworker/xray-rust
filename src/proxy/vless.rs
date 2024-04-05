@@ -1,4 +1,4 @@
 
-pub struct Vless {
+pub struct VlessStream {
     
 }

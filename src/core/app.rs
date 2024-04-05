@@ -20,8 +20,8 @@ impl App {
     }
 
     pub async fn start(&self) -> Result<(), ()> {
-        let server = Server::new(self.app_config.clone());
-        server.start().await.unwrap();
+        // let server = Server::new(self.app_config.clone());
+        // server.start().await.unwrap();
         Ok(())
     }
 }

@@ -1,22 +1,21 @@
+use std::error::Error;
+use log::{log, warn};
+use crate::core::feature::Feature;
 
-#[derive(Debug)]
-pub struct Sniff {
-
-}
-
-#[derive(Debug)]
-pub struct DownStream {
-    tag: String,
-    addr: String,
-    port: i32,
-    interfaces: Vec<String>,
-    sniff: Sniff,
-}
-
-#[derive(Debug)]
-pub struct UpStream {
-    tag: String,
-    addr: String,
-    port: i32,
-    transport: String,
+// 采用接口的形式，定义一组接口，让所有的 stream 实现该接口
+pub trait Stream {
+    async fn start(&self) -> Result<(), Box<dyn Error>> {
+        warn!("not impl");
+        Ok(())
+    }
+    fn close(&self) -> Result<(), Box<dyn Error>> {
+        warn!("not impl");
+        Ok(())
+    }
+    // to get the stream feature
+    fn feature(&self) -> Box<dyn Feature>;
+    fn handle(bs: Vec<u8>) -> Result<(), Box<dyn Error>> {
+        warn!("not impl");
+        Ok(())
+    }
 }
