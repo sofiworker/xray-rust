@@ -13,9 +13,14 @@ pub trait Stream {
         Ok(())
     }
     // to get the stream feature
-    fn feature(&self) -> Box<dyn Feature>;
+    // fn feature(&self) -> impl Feature;
+
     fn handle(bs: Vec<u8>) -> Result<(), Box<dyn Error>> {
         warn!("not impl");
         Ok(())
+    }
+
+    async fn dail() -> Result<(), Box<dyn Error>> {
+        return Ok(())
     }
 }

@@ -1,6 +1,10 @@
+use std::convert::Infallible;
 use std::error::Error;
 use std::net::{IpAddr, Ipv4Addr, SocketAddr};
+use std::str::FromStr;
+
 use bytes::{Bytes, BytesMut};
+use http_body_util::Full;
 use hyper::{Request, Response};
 use hyper::server::conn::http1;
 use hyper::service::service_fn;
@@ -8,11 +12,9 @@ use hyper_util::rt::{TokioExecutor, TokioIo};
 use hyper_util::server::conn::auto;
 use log::error;
 use tokio::net::{TcpListener, TcpStream};
-use crate::core::stream::Stream;
+
 use crate::core::feature::Feature;
-use std::convert::Infallible;
-use std::str::FromStr;
-use http_body_util::Full;
+use crate::core::stream::Stream;
 
 pub enum HttpVersion {
     V1,
@@ -77,23 +79,23 @@ impl Stream for HttpStream {
                 }
             });
         }
-        Ok(())
     }
 
     fn close(&self) -> Result<(), Box<dyn Error>> {
         Ok(())
     }
 
-    fn feature(&self) -> Box<dyn Feature> {
-        Box::new(Self {
-            config: HttpConfig {
-                addr: "".to_string(),
-                port: 0,
-                interface: "".to_string(),
-                version: HttpVersion::V1,
-            }
-        })
-    }
+    // fn feature(&self) -> impl Feature {
+    //     // Box::new(Self {
+    //     //     config: HttpConfig {
+    //     //         addr: "".to_string(),
+    //     //         port: 0,
+    //     //         interface: "".to_string(),
+    //     //         version: HttpVersion::V1,
+    //     //     }
+    //     // })
+    //     *self
+    // }
 
     fn handle(bs: Vec<u8>) -> Result<(), Box<dyn Error>> {
         BytesMut::with_capacity(10);
@@ -105,6 +107,12 @@ impl Feature for HttpStream {}
 
 #[cfg(test)]
 mod test {
+    use std::time;
+
+    use http_body_util::BodyStream;
+    use hyper_util::rt::TokioIo;
+    use tokio::net::TcpStream;
+
     use crate::core::stream::Stream;
     use crate::proxy::http::{HttpConfig, HttpStream, HttpVersion};
 
@@ -117,5 +125,35 @@ mod test {
             version: HttpVersion::V1,
         });
         server.start().await.unwrap();
+    }
+
+    #[tokio::test]
+    async fn test_http_client() {
+        // Parse our URL...
+        let url = "http://127.0.0.1:80".parse::<hyper::Uri>().unwrap();
+
+        // Get the host and the port
+        let host = url.host().expect("uri has no host");
+        let port = url.port_u16().unwrap_or(80);
+
+        let address = format!("{}:{}", host, port);
+
+        // Open a TCP connection to the remote host
+        let stream = TcpStream::connect(address).await.unwrap();
+
+        // Use an adapter to access something implementing `tokio::io` traits as if they implement
+        // `hyper::rt` IO traits.
+        let io = TokioIo::new(stream);
+
+        // Create the Hyper client
+        let (mut sender, conn) = hyper::client::conn::http1::handshake::<TokioIo<TcpStream>, BodyStream<String>>(io).await.unwrap();
+
+        // Spawn a task to poll the connection, driving the HTTP state
+        tokio::task::spawn(async move {
+            if let Err(err) = conn.await {
+                println!("Connection failed: {:?}", err);
+            }
+        });
+        tokio::time::sleep(time::Duration::from_secs(1000)).await;
     }
 }
